@@ -1,0 +1,16 @@
+version: '3'
+services:
+  bind:
+    image: sameersbn/bind:9.9.5-20170129
+    container_name: Bind
+    restart: always
+    ports:
+    - '192.168.1.50:53:53/tcp'
+    - '192.168.1.50:53:53/udp'
+    - '192.168.1.50:10001:10000'
+    volumes:
+    - './volume_data/main:/data'
+networks:
+  default:
+    external:
+      name: main
