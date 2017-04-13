@@ -1,7 +1,8 @@
 version: '3'
 services:
   bind:
-    image: sameersbn/bind:9.9.5-20170129
+    build: bind
+    image: danieleagle/bind:9.9.5
     container_name: Bind
     restart: always
     ports:
@@ -9,7 +10,9 @@ services:
     - '192.168.1.50:53:53/udp'
     - '192.168.1.50:10001:10000'
     volumes:
-    - './volume_data/main:/data'
+    - './bind/volume_data/main:/data'
+    environment:
+      - ROOT_PASSWORD=changeMeToSomethingGood
 networks:
   default:
     external:
