@@ -1,0 +1,19 @@
+version: '3'
+services:
+  bind-ns1:
+    build: bind
+    image: <container-registry-url>/backbone/bind:9.10.3
+    container_name: Bind9-NS1
+    restart: always
+    ports:
+    - 53:53/tcp
+    - 53:53/udp
+    - 10001:10000
+    volumes:
+    - /nfs/docker-data/container-data/backbone/bind9/ns1/data:/data
+    environment:
+      - ROOT_PASSWORD=changeMeToSomethingGood
+networks:
+  default:
+    external:
+      name: spacely-eng-disparate
