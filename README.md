@@ -2,6 +2,8 @@
 
 The files within allow for running a private DNS server using Bind inside a Docker container. This is based on the following [project](https://hub.docker.com/r/sameersbn/bind/) from **sameersbn**.
 
+Also, if you wish to setup a highly available complete CICD solution running in Azure using this solution, see [this article](https://danieleagle.com/2017/10/setting-up-a-private-cicd-solution-in-azure/). It contains a plethora of information that will greatly complement the text within. The Azure specific Bind files can be found in the [azure](./azure/) folder within this repository.
+
 ## Latest Changes
 
 Be sure to see the [change log](./CHANGELOG.md) if interested in tracking changes leading to the current release.
@@ -12,26 +14,24 @@ Be sure to see the [change log](./CHANGELOG.md) if interested in tracking change
 
     `sudo docker network create main`
 
-2. Open the included **docker-compose.yml** and under **ports**, change the instances of the IP `192.168.1.50` to the IP address of the machine running Docker.
+2. In the same file, edit the **ROOT_PASSWORD** environment variable and change it to the desired password.
 
-3. In the same file, edit the **ROOT_PASSWORD** environment variable and change it to the desired password.
-
-4. Run the following command (geared toward Linux) in the root of where the this repository was cloned:
+3. Run the following command (geared toward Linux) in the root of where the this repository was cloned:
 
     `sudo docker-compose up -d`
 
-5. Open the Webmin interface and navigate to the Bind settings page. The username will be **root** and the password the value you assigned previously.
+4. Open the Webmin interface and navigate to the Bind settings page. The username will be **root** and the password the value you assigned previously.
 
-6. Under `Access Control Lists`, add a ACL named **trusted** or any preferred name with the following (depending on network configuration):
+5. Under `Access Control Lists`, add a ACL named **trusted** or any preferred name with the following (depending on network configuration):
 
     ``` bash
     192.168.1.0/24
     127.0.0.1
     ```
 
-7. Navigate to `Zone Defaults` and then under the `Default Zone Settings` section change `Allow Queries From` to `Listed`. In the edit box specify the ACL created earlier in the previous step (e.g. **trusted**). Now click `Return to zone list`.
+6. Navigate to `Zone Defaults` and then under the `Default Zone Settings` section change `Allow Queries From` to `Listed`. In the edit box specify the ACL created earlier in the previous step (e.g. **trusted**). Now click `Return to zone list`.
 
-8. Click on `Edit Config File` then on the **Edit config file** drop down, select `named.conf.options` and then click the **Edit** button. This is where some important options will be configured to ensure this DNS server truly is private.
+7. Click on `Edit Config File` then on the **Edit config file** drop down, select `named.conf.options` and then click the **Edit** button. This is where some important options will be configured to ensure this DNS server truly is private.
 
     Ensure your **named.conf.options** configuration file looks like the code below.
 
@@ -59,35 +59,27 @@ Be sure to see the [change log](./CHANGELOG.md) if interested in tracking change
 
     Feel free to change the forwarders to different DNS servers if desired (currently it's set to Google's Public DNS).
 
-9. Click on the `Save` button and then `Apply Configuration`. Now click `Return to zone list`.
+8. Click on the `Save` button and then `Apply Configuration`. Now click `Return to zone list`.
 
-10. Test the DNS server is working by typing (geared toward Linux) `host google.com 192.168.1.50` (replace the IP address with the one used by your machine running Docker). If a response is received, you are ready to continue.
+9. Test the DNS server is working by typing (geared toward Linux) `host google.com 192.168.1.50` (replace the IP address with the one used by your machine running Docker). If a response is received, you are ready to continue.
 
-11. Create a Reverse Zone by clicking on `Create Master Zone`. For **Zone Type**, select **Reverse**.
+10. Create a Reverse Zone by clicking on `Create Master Zone`. For **Zone Type**, select **Reverse**.
 
-12. In the **Domain name / Network** box, enter the IP address of your DNS server: `192.168.1.50` (replace the IP address with the one used by your machine running Docker). Enter `ns1.internal.example.com` (replace **example.com** with the domain of your choice) in the **Master server** box. Enter the email address of the DNS administrator in the **Email address** box below. Now click the **Create** button. Now click `Return to zone list`.
+11. In the **Domain name / Network** box, enter the IP address of your DNS server: `192.168.1.50` (replace the IP address with the one used by your machine running Docker). Enter `ns1.internal.example.com` (replace **example.com** with the domain of your choice) in the **Master server** box. Enter the email address of the DNS administrator in the **Email address** box below. Now click the **Create** button. Now click `Return to zone list`.
 
-13. Create a Forward Zone by clicking on `Create Master Zone`. For **Zone Type**, select **Forward**. In the **Domain name / Network** box, enter your domain: `internal.example.com` (replace **example.com** with the domain of your choice). In the **Master server** box, enter `ns1.internal.example.com` (replace **example.com** with the domain of your choice). Enter the email address of the DNS administrator in the **Email address** box below. Now click the **Create** button.
+12. Create a Forward Zone by clicking on `Create Master Zone`. For **Zone Type**, select **Forward**. In the **Domain name / Network** box, enter your domain: `internal.example.com` (replace **example.com** with the domain of your choice). In the **Master server** box, enter `ns1.internal.example.com` (replace **example.com** with the domain of your choice). Enter the email address of the DNS administrator in the **Email address** box below. Now click the **Create** button.
 
-14. Click `Address` to create a new DNS record. In the **Name** box, enter `ns` and then in the **Address** box, enter `192.168.1.50` (replace the IP address with the one used by your machine running Docker). Click the **Create** button.
+13. Click `Address` to create a new DNS record. In the **Name** box, enter `ns` and then in the **Address** box, enter `192.168.1.50` (replace the IP address with the one used by your machine running Docker). Click the **Create** button.
 
-15. Create applicable A records for the hosts of your choice (e.g. **webserver.internal.example.com**) by clicking on `Address` again. Enter the desired name (e.g. **nas**) and its IP address then click **Create**. The name will be added to the list as `host.internal.example.com` (e.g. **nas.internal.example.com**).
+14. Create applicable A records for the hosts of your choice (e.g. **webserver.internal.example.com**) by clicking on `Address` again. Enter the desired name (e.g. **nas**) and its IP address then click **Create**. The name will be added to the list as `host.internal.example.com` (e.g. **nas.internal.example.com**).
 
-16. After entering in all applicable information, click on `Apply Configuration`. This should update the DNS server to use the new updated settings.
+15. After entering in all applicable information, click on `Apply Configuration`. This should update the DNS server to use the new updated settings.
 
-17. Finally, change the system time to the correct value in Webmin by going to the search bar and typing **System Time** and then clicking on the relevant search result.
-
-## Note About IP Address
-
-This image uses the local IP address `192.168.1.50` in network mapping and configuration files. Please feel free to change this to your liking. In addition, you may also change the network `192.168.1.0/24` later specified in configuration files to the network type of your choice.
+16. Finally, change the system time to the correct value in Webmin by going to the search bar and typing **System Time** and then clicking on the relevant search result.
 
 ## Docker Network
 
 This image uses a network named `main`. Be sure to create that network by typing `sudo docker network create main` before running `docker-compose up -d`.
-
-## Docker Compose File IP Address Port Binding
-
-The Docker Compose file requires an explicit IP address for binding to port 53 (TCP and UDP) in order for Bind to properly work. Currently, the file uses the following IP address: `192.168.1.50`. If a different IP address is needed then it will need to be changed in **docker-compose.yml**.
 
 ## Webmin Interface
 
