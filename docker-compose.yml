@@ -2,7 +2,7 @@ version: '3'
 services:
   bind:
     build: bind
-    image: danieleagle/bind:9.9.5
+    image: danieleagle/bind:9.10.3
     container_name: Bind
     restart: always
     ports:

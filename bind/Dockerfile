@@ -1,10 +1,17 @@
 FROM ubuntu:14.04.5
 MAINTAINER Daniel Eagle
 
-ENV BIND_USER=bind \
-  BIND_VERSION=1:9.9.5 \
-  WEBMIN_VERSION=1.831 \
+ENV BIND_USER=bind-dns \
+  BIND_USER_GROUP=bind-dns \
+  BIND_USER_UID=1000 \
+  BIND_USER_GID=1000 \
+  BIND_VERSION=1:9.10.3 \
+  WEBMIN_VERSION=1.850 \
   DATA_DIR=/data
+
+# Create bind-dns group and user
+RUN groupadd -g ${BIND_USER_GID} ${BIND_USER_GROUP} \
+  && useradd -u ${BIND_USER_UID} -g ${BIND_USER_GID} -m -s /bin/bash ${BIND_USER}
 
 # Install Webmin and Bind
 RUN apt-get update \
@@ -21,7 +28,7 @@ COPY ./config/entrypoint.sh /sbin/entrypoint.sh
 RUN chmod +x /sbin/entrypoint.sh
 
 # Add Tini
-ENV TINI_VERSION v0.14.0
+ENV TINI_VERSION v0.15.0
 ADD https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini /tini
 RUN chmod +x /tini
 
