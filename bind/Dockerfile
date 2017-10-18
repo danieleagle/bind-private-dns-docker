@@ -1,4 +1,4 @@
-FROM ubuntu:14.04.5
+FROM ubuntu:16.04
 MAINTAINER Daniel Eagle
 
 ENV BIND_USER=bind-dns \
