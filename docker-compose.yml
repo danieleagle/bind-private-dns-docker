@@ -3,12 +3,12 @@ services:
   bind:
     build: bind
     image: danieleagle/bind:9.10.3
-    container_name: Bind
+    container_name: Bind-NS1
     restart: always
     ports:
-    - '192.168.1.50:53:53/tcp'
-    - '192.168.1.50:53:53/udp'
-    - '192.168.1.50:10001:10000'
+    - 53:53/tcp
+    - 53:53/udp
+    - 10001:10000
     volumes:
     - './bind/volume_data/main:/data'
     environment:
